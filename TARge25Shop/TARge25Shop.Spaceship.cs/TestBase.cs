@@ -7,6 +7,9 @@ using TARge25Shop.Core.ServiceInterface;
 using TARge25Shop.Data;
 using TARge25Shop_SpaceshipTest.Macros;
 using TARge25Shop_SpaceshipTest.Mock;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace TARge25Shop_SpaceshipTest
 {

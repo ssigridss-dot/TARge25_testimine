@@ -40,7 +40,7 @@ namespace TARge25Shop_SpaceshipTest
 
         [Fact]
         // Selles testis kontrollitakse, et Spaceshipi päring andmebaasist ei tohiks tagastada
-        // objekti kui Id-d ei ole samad.
+        // objekti, kui Id-d ei ole samad.
         public async Task ShouldNot_GetSpaceShipById_WhenIdNotEqual()
         {
             //ülesseade
@@ -55,6 +55,10 @@ namespace TARge25Shop_SpaceshipTest
         }
 
         //Seleta kodus lahti, nagu eelnevate testide laused eesti keelde, selle testi oma ka...
+
+        //Seletus:
+        // Selles testis kontrollitakse, et Spaceshipi päring andmebaasist peaks tagastama objekti,
+        // kui Guid ja Id on samad.
         [Fact]
         public async Task Should_GetSpaceshipById_WhenGuidIsEqual()
         {
@@ -70,6 +74,9 @@ namespace TARge25Shop_SpaceshipTest
         }
 
         [Fact]
+
+        //Seletus:
+        // Selles testis kontrollitakse, et kosmoselaeva kustutamisel andmebaasist oleksid Id-d samad.
         public async Task Should_SpaceshipDeletedById_WhenReturnedResultIsEqual()
         {
             //ülesseade
@@ -80,7 +87,7 @@ namespace TARge25Shop_SpaceshipTest
             var deleteSpaceship = await Svc<ISpaceshipServices>().Delete((Guid)addSpaceship.Id);
 
             //kontroll
-            Assert.Equal(addSpaceship)
+            Assert.Equal(addSpaceship.Id, deleteSpaceship.Id);
 
         }
 

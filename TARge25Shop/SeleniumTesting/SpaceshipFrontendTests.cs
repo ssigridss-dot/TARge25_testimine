@@ -85,6 +85,10 @@ namespace TARge25Shop.SeleniumTesting
 
 
         }
+
+        [Fact]
+        public void Should_Navigate
+
         private static IWebDriver SetupAndNavigateSIndex()
         {
             //firefoxi käskiv ja juhtiv draiver

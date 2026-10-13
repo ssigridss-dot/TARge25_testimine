@@ -35,6 +35,7 @@
                     <td id="IndexCrewSpaceship">@spaceship.Crew</td>
                     <td id="IndexActionsSpaceship"></td>
                     <td>
+                        <span id="IndexSpaceshipId" hidden>@spaceship.Id</span>
                         <a asp-action="details" asp-controller="spaceship" asp-route-id="@spaceship.Id" class="btn btn-primary">Details</a>
                         <a asp-action="update" asp-controller="spaceship" asp-route-id="@spaceship.Id" class="btn btn-primary">Update</a>
                         <a asp-action="delete" asp-controller="spaceship" asp-route-id="@spaceship.Id" class="btn btn-outline-danger">Delete</a>

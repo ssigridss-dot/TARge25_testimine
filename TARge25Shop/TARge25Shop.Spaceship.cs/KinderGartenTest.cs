@@ -140,5 +140,36 @@ namespace TARge25Shop_SpaceshipTest
             Assert.Equal(dto.CreatedAt, domain.CreatedAt);
             Assert.NotEqual(dto.UpdatedAt, domain.CreatedAt);
         }
+
+        [Fact]
+        public async Task ShouldNot_UpdateKinderGartenByID_WhenNoDataIsUpdated()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+            var createdKinderGarten = await Svc<IKinderGartenServices>().Create(dto);
+
+            // Tegevus
+            KinderGartenDto nullDto = new KinderGartenDto()
+            {
+                GroupName = null,
+                ChildrenCount = 0,
+                KinderGartenName = null,
+                TeacherName = null,
+                CreatedAt = DateTime.MinValue,
+                UpdatedAt = DateTime.MinValue
+            };
+            var result = await Svc<IKinderGartenServices>().Update(nullDto);
+
+            // Kontroll
+            Assert.NotEqual(createdKinderGarten.Id, result?.Id);
+        }
     }
 }

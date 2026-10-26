@@ -63,7 +63,15 @@ namespace TARge25Shop_SpaceshipTest
         public async Task Should_KinderGartenDeletedById_WhenReturnedResultIsEqual()
         {
             // Ülesseade
-            KinderGartenDto dto = MockKinderGartenData();
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
 
             // Tegevus
             var addKinderGarten = await Svc<IKinderGartenServices>().Create(dto);
@@ -71,6 +79,30 @@ namespace TARge25Shop_SpaceshipTest
 
             // Kontroll
             Assert.Equal(addKinderGarten.Id, deleteKinderGarten.Id);
+        }
+
+        [Fact]
+        public async Task ShouldNot_DeleteKinderGartenByID_WhenDidNotDeleteKinderGarten()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            // Tegevus
+            var kinderGarten1 = await Svc<IKinderGartenServices>().Create(dto);
+            var kinderGarten2 = await Svc<IKinderGartenServices>().Create(dto);
+
+            var result = await Svc<IKinderGartenServices>().Delete((Guid)kinderGarten2.Id);
+
+            // Kontroll
+            Assert.NotEqual(kinderGarten1.Id, result.Id);
         }
     }
 }

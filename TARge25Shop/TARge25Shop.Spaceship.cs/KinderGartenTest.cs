@@ -240,5 +240,28 @@ namespace TARge25Shop_SpaceshipTest
             Assert.Equal(createdKinderGarten.Id, deletedKinderGarten.Id);
             Assert.Null(result);
         }
+
+        [Fact]
+        public async Task ShouldNot_RemoveKinderGartenFromDatabase_WhenKinderGartenIdIsDifferent()
+        {
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+            var createdKinderGarten1 = await Svc<IKinderGartenServices>().Create(dto);
+            var createdKinderGarten2 = await Svc<IKinderGartenServices>().Create(dto);
+            var deleteResult = await Svc<IKinderGartenServices>().Delete((Guid)createdKinderGarten2.Id);
+            var kinderGartenInDb = await Svc<IKinderGartenServices>().DetailAsync((Guid)createdKinderGarten1.Id);
+
+            // Kontroll
+            Assert.NotNull(kinderGartenInDb);
+            Assert.NotEqual(deleteResult.Id, createdKinderGarten1.Id);
+            Assert.Equal(createdKinderGarten1.Id, kinderGartenInDb.Id);
+        }
     }
 }

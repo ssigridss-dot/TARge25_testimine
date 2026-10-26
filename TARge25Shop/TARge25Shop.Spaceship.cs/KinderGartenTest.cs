@@ -30,5 +30,19 @@ namespace TARge25Shop_SpaceshipTest
             // Kontroll
             Assert.NotNull(result);
         }
+
+        [Fact]
+        public async Task ShouldNot_GetKinderGartenById_WhenIdNotEqual()
+        {
+            // Ülesseade
+            Guid wrongGuid = Guid.NewGuid();
+            Guid goodGuid = Guid.Parse("f40900a6-7c03-47af-b10c-4a035f8664fa");
+
+            // Tegevus
+            await Svc<IKinderGartenServices>().DetailAsync(goodGuid);
+
+            // Kontroll
+            Assert.NotEqual(wrongGuid, goodGuid);
+        }
     }
 }

@@ -104,5 +104,41 @@ namespace TARge25Shop_SpaceshipTest
             // Kontroll
             Assert.NotEqual(kinderGarten1.Id, result.Id);
         }
+
+        [Fact]
+        public async Task Should_UpdateKinderGartenByID_WhenUpdatingData()
+        {
+            // Ülesseade
+            var guid = new Guid("68eb8abd-086a-4c8b-9695-71234143f709");
+
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            KinderGartenDto domain = new();
+            domain.Id = Guid.Parse("68eb8abd-086a-4c8b-9695-71234143f709");
+            domain.ChildrenCount = 30;
+            domain.GroupName = "Mürakarud";
+            domain.KinderGartenName = "Lilleke";
+            domain.TeacherName = "Maali";
+            domain.CreatedAt = dto.CreatedAt;
+            domain.UpdatedAt = DateTime.UtcNow;
+
+            // Tegevus
+            await Svc<IKinderGartenServices>().Update(dto);
+
+            // Kontroll
+            Assert.Equal(domain.Id, guid);
+            Assert.NotEqual(dto.ChildrenCount, domain.ChildrenCount);
+            Assert.NotEqual(dto.GroupName, domain.GroupName);
+            Assert.Equal(dto.CreatedAt, domain.CreatedAt);
+            Assert.NotEqual(dto.UpdatedAt, domain.CreatedAt);
+        }
     }
 }

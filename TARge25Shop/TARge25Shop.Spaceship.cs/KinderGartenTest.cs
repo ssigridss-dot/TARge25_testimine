@@ -193,5 +193,28 @@ namespace TARge25Shop_SpaceshipTest
             // Kontroll
             Assert.True(result.ChildrenCount < 0);
         }
+
+        [Fact]
+        public async Task ShouldNot_CreateKinderGarten_WhenChildrenCountIsZeroOrLess()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+            dto.ChildrenCount = 0;
+
+            // Tegevus
+            var result = await Svc<IKinderGartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.NotNull(result);
+            Assert.Equal(0, result.ChildrenCount);
+        }
     }
 }

@@ -263,5 +263,28 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotEqual(deleteResult.Id, createdKinderGarten1.Id);
             Assert.Equal(createdKinderGarten1.Id, kinderGartenInDb.Id);
         }
+
+        [Fact]
+        //See test kontrollib, et lasteaiarühma nimi ei oleks tühi. Kui see on tühi,
+        //siis test ebaõnnestub.
+        public async Task Should_VerifyGroupNameIsNotEmpty()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            // Tegevus
+            var result = await Svc<IKinderGartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.False(string.IsNullOrEmpty(result.GroupName));
+        }
     }
 }

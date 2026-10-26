@@ -58,5 +58,19 @@ namespace TARge25Shop_SpaceshipTest
             // Kontroll
             Assert.Equal(databaseGuid, seekGuid);
         }
+
+        [Fact]
+        public async Task Should_KinderGartenDeletedById_WhenReturnedResultIsEqual()
+        {
+            // Ülesseade
+            KinderGartenDto dto = MockKinderGartenData();
+
+            // Tegevus
+            var addKinderGarten = await Svc<IKinderGartenServices>().Create(dto);
+            var deleteKinderGarten = await Svc<IKinderGartenServices>().Delete((Guid)addKinderGarten.Id);
+
+            // Kontroll
+            Assert.Equal(addKinderGarten.Id, deleteKinderGarten.Id);
+        }
     }
 }

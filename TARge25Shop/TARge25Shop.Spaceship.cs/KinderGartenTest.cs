@@ -267,7 +267,7 @@ namespace TARge25Shop_SpaceshipTest
         [Fact]
         //See test kontrollib, et lasteaiarühma nimi ei oleks tühi. Kui see on tühi,
         //siis test ebaõnnestub.
-        public async Task Should_VerifyGroupNameIsNotEmpty()
+        public async Task Should_VerifyGroupNameIsNotNullOrEmpty()
         {
             // Ülesseade
             KinderGartenDto dto = new KinderGartenDto()
@@ -290,7 +290,7 @@ namespace TARge25Shop_SpaceshipTest
         [Fact]
         //See test kontrollib, et lasteaia nimi ei oleks tühi. Kui see on tühi,
         //siis test ebaõnnestub.
-        public async Task Should_VerifyKinderGartenNameIsNotEmpty()
+        public async Task Should_VerifyKinderGartenNameIsNotNullOrEmpty()
         {
             // Ülesseade
             KinderGartenDto dto = new KinderGartenDto()
@@ -309,5 +309,29 @@ namespace TARge25Shop_SpaceshipTest
             // Kontroll
             Assert.False(string.IsNullOrEmpty(result.KinderGartenName));
         }
+
+        [Fact]
+        //See test kontrollib, et õpetaja nimi ei oleks tühi. Kui see on tühi,
+        //siis test ebaõnnestub.
+        public async Task Should_VerifyTeacherNameIsNotNullOrEmpty()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            // Tegevus
+            var result = await Svc<IKinderGartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.False(string.IsNullOrEmpty(result.TeacherName));
+        }
+
     }
 }

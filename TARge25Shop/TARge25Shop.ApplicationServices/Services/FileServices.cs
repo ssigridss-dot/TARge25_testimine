@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using TARge25Shop.Core.Domain;
 using TARge25Shop.Core.Dto;
 using TARge25Shop.Core.ServiceInterface;
 using TARge25Shop.Data;
-
 
 namespace TARge25Shop.ApplicationServices.Services
 {
@@ -62,6 +62,44 @@ namespace TARge25Shop.ApplicationServices.Services
                 }
             }
         }
+
+        public async Task<FileToApi> RemoveImageFromApi(FileToApiDto dto)
+        {
+            var image = await _context.FileToApis
+                .FirstOrDefaultAsync(x => x.Id == dto.Id);
+
+            if (image == null)
+            {
+                return null;
+            }
+
+            _context.FileToApis.Remove(image);
+            await _context.SaveChangesAsync();
+
+            return image;
+        }
+
+        public async Task<List<FileToApi>> RemoveImagesFromApi(FileToApiDto[] dtos)
+        {
+            var images = new List<FileToApi>();
+
+            foreach (var dto in dtos)
+            {
+                var image = await _context.FileToApis
+                    .FirstOrDefaultAsync(x => x.Id == dto.Id);
+
+                if (image != null)
+                {
+                    _context.FileToApis.Remove(image);
+                    images.Add(image);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return images;
+        }
+
         public void UploadKinderGartenFilesToDatabase(KinderGartenDto dto, KinderGarten domain)
         {
             // check if there are files
@@ -100,7 +138,6 @@ namespace TARge25Shop.ApplicationServices.Services
         }
 
 
-        //teha parandus, et siin ei oleks return null
         public async Task<FileToDatabase> RemoveImagesFromDatabase(FileToDatabaseDto[] dtos)
         {
             foreach (var dto in dtos)

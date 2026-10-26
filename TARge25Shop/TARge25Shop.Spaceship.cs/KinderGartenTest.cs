@@ -216,5 +216,29 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotNull(result);
             Assert.Equal(0, result.ChildrenCount);
         }
+
+        [Fact]
+        public async Task Should_RemoveKinderGartenFromDatabase_WhenKinderGartenIsDeleted()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            // Tegevus
+            var createdKinderGarten = await Svc<IKinderGartenServices>().Create(dto);
+            var deletedKinderGarten = await Svc<IKinderGartenServices>().Delete((Guid)createdKinderGarten.Id);
+            var result = await Svc<IKinderGartenServices>().DetailAsync((Guid)createdKinderGarten.Id);
+
+            // Kontrollimine
+            Assert.Equal(createdKinderGarten.Id, deletedKinderGarten.Id);
+            Assert.Null(result);
+        }
     }
 }

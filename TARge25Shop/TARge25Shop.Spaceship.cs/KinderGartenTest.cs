@@ -333,6 +333,30 @@ namespace TARge25Shop_SpaceshipTest
             Assert.False(string.IsNullOrEmpty(result.TeacherName));
         }
 
+        [Fact]
+        // See test kontrollib, et lasteaia otsimisel Id järgi, kui Id-d on võrdsed, ei ole
+        // tulemus tühi (st ei tagastata null).
+        public async Task ShouldNot_GetKinderGartenById_WhenResultIsNotNull()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            // Tegevus
+            var created = await Svc<IKinderGartenServices>().Create(dto);
+            var result = await Svc<IKinderGartenServices>().DetailAsync((Guid)created.Id);
+
+            // Kontroll
+            Assert.NotNull(result);
+        }
+
 
 
     }

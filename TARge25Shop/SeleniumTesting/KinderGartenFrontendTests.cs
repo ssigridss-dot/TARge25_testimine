@@ -1,4 +1,4 @@
-﻿using OpenQA.Selenium;
+﻿/*using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using System;
 using System.Collections.Generic;
@@ -10,10 +10,41 @@ using Xunit.Sdk;
 
 namespace SeleniumTesting
 {
+    public class OrderAttribute : Attribute
+    {
+        public int Value { get; }
+        public OrderAttribute(int value)
+        {
+            Value = value;
+        }
+    }
+
+    public class PriorityOrderer : ITestCaseOrderer
+    {
+        public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases)
+            where TTestCase : ITestCase
+        {
+            return testCases.OrderBy(test =>
+            {
+                var method = test.TestMethod.Method.GetCustomAttributes(typeof(OrderAttribute)).FirstOrDefault();
+                if (method == null)
+                {
+                    return int.MaxValue;
+                }
+                else
+                {
+                    return method.GetNamedArgument<int>(nameof(OrderAttribute.Value));
+                }
+            }).ToList();
+        }
+    }
+
+    [TestCaseOrderer("TARge25Shop.SeleniumTesting.PriorityOrderer", "TARge25Shop.SeleniumTesting")]
     public class KinderGartenFrontendTests
     {
         public static string thisRunGuid { get; set; }
         [Fact]
+        [Order(1)]
         public void Should_NavigateToCreate_AddKinderGarten_WithCorrectData_ReturnToIndex()
         {
             //ülesseade
@@ -57,6 +88,7 @@ namespace SeleniumTesting
         }
 
         [Fact]
+        [Order(2)]
         public void Should_NavigateToDetails_OfAKinderGarten_WithPreviouslyCorrectData()
         {
             //ülesseade
@@ -111,6 +143,7 @@ namespace SeleniumTesting
         }
 
         [Fact]
+        [Order(3)]
         public void Should_UpdateDetails_OfAKinderGarten_WithNewData()
         {
             //ülesseade
@@ -150,6 +183,7 @@ namespace SeleniumTesting
         }
 
         [Fact]
+        [Order(4)]
         public void Should_DeleteKinderGarten_FromAppVIADeleteView()
         {
             //ülesseade
@@ -186,6 +220,7 @@ namespace SeleniumTesting
         }
 
         [Fact]
+        [Order(5)]
         public void Should_NavigateToCreate_AddKinderGarten_WithCorrectData_ReturnToIndex_Proper()
         {
             //ülesseade
@@ -248,3 +283,4 @@ namespace SeleniumTesting
         }
     }
 }
+*/

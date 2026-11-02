@@ -380,6 +380,41 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotNull(result.Id);
         }
 
+        [Fact]
+        // See test kontrollib, et kahe erineva lasteaia andmebaasi lisamisel 
+        // on nende lasteaedade Id-d erinevad(ei ole võrdsed). Test ebaõnnestub, 
+        // kui lisatud lasteaedade Id-d on võrdsed.
+        public async Task ShouldNot_HaveEqualIds_WhenTwoKinderGartensAreCreated()
+        {
+            // Ülesseade
+            KinderGartenDto dto1 = new KinderGartenDto()
+            {
+                GroupName = "Mürakarud",
+                ChildrenCount = 7,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Maimu",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            KinderGartenDto dto2 = new KinderGartenDto()
+            {
+                GroupName = "Tõruke",
+                ChildrenCount = 4,
+                KinderGartenName = "Siili",
+                TeacherName = "Mari",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            // Tegevus
+            var result1 = await Svc<IKinderGartenServices>().Create(dto1);
+            var result2 = await Svc<IKinderGartenServices>().Create(dto2);
+
+            // Kontroll
+            Assert.NotEqual(result1.Id, result2.Id);
+        }
+
 
 
     }

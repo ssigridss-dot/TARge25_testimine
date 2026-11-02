@@ -357,6 +357,29 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotNull(result);
         }
 
+        [Fact]
+        // See test kontrollib, et Create loodud lasteaial on Id, et see ei ole null.
+        // Kui Id on null, siis test ebaõnnestub.
+        public async Task ShouldNot_CreateKinderGarten_WhenIdIsNull()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            // Tegevus
+            var result = await Svc<IKinderGartenServices>().Create(dto);
+
+            // Kontroll
+            Assert.NotNull(result.Id);
+        }
+
 
 
     }

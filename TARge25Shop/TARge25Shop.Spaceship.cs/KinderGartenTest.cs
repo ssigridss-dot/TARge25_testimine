@@ -471,5 +471,31 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotEqual(DateTime.MinValue, updated.CreatedAt);
         }
 
+        [Fact]
+        // See test kontrollib, et lasteaia laste arvu saab andmete
+        // uuendamisel(Update) muuta ja muutused salvestatakse andmebaasi.
+        public async Task Should_ChangeChildrenCount_WhenUpdated()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            var created = await Svc<IKinderGartenServices>().Create(dto);
+            dto.Id = created.Id;
+            dto.ChildrenCount = 15;
+
+            // Tegevus
+            var updated = await Svc<IKinderGartenServices>().Update(dto);
+
+            // Kontroll
+            Assert.Equal(15, updated.ChildrenCount);
+        }
     }
 }

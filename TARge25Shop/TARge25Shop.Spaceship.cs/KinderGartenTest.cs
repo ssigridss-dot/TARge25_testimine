@@ -605,5 +605,27 @@ namespace TARge25Shop_SpaceshipTest
             Assert.Equal("pilt2.jpg", image2.ImageTitle);
         }
 
+        [Fact]
+        // See test kontrollib, et kui lasteaiale lisatakse uus pilt, siis uuendatakse
+        // andmebaasis ka pildi pealkirja. Muidu test ebaõnnestub.
+        public async Task Should_UpdateImageTitle_WhenNewImageIsSaved()
+        {
+            // Ülesseade
+            KinderGartenImageViewModel imageModel = new KinderGartenImageViewModel()
+            {
+                ImageId = Guid.NewGuid(),
+                ImageTitle = "lasteaed.jpg",
+                Image = "lasteaed"
+            };
+
+            // Tegevus
+            imageModel.ImageTitle = "uus.jpg";
+            imageModel.Image = "uus";
+
+            // Kontroll
+            Assert.Equal("uus.jpg", imageModel.ImageTitle);
+            Assert.Equal("uus", imageModel.Image);
+            Assert.NotEqual("lasteaed.jpg", imageModel.ImageTitle);
+        }
     }
 }

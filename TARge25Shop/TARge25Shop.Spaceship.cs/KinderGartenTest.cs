@@ -540,5 +540,23 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotNull(imageModel.ImageData);
             Assert.Equal(kindergartenId, imageModel.KinderGartenId);
         }
+
+        [Fact]
+        // See test kontrollib, et ImageData ei ole null, kui pilt
+        // on lasteaia andmetesse lisatud. Muidu test ebaõnnestub.
+        public async Task ShouldNot_HaveNullImageData_WhenImageIsAdded()
+        {
+            // Ülesseade
+            var mockBytes = Encoding.UTF8.GetBytes("ookull.jpeg");
+            KinderGartenImageViewModel imageModel = new KinderGartenImageViewModel()
+            {
+                ImageTitle = "ookull.jpeg",
+                ImageData = mockBytes
+            };
+
+            // Kontroll
+            Assert.NotNull(imageModel.ImageData);
+            Assert.True(imageModel.ImageData.Length > 0);
+        }
     }
 }

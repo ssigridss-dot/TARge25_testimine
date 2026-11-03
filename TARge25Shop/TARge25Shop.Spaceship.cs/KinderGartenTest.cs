@@ -497,5 +497,20 @@ namespace TARge25Shop_SpaceshipTest
             // Kontroll
             Assert.Equal(15, updated.ChildrenCount);
         }
+
+        [Fact]
+        // See test kontrollib, et kui otsitakse lasteaeda suvalise Id järgi,
+        // siis tagastatakse null. Kui lasteaed olematu Id järgi leitakse, siis test ebaõnnestub.
+        public async Task Should_ReturnNull_WhenKinderGartenDoesNotExist()
+        {
+            // Ülesseade
+            Guid randomGuid = Guid.NewGuid();
+
+            // Tegevus
+            var result = await Svc<IKinderGartenServices>().DetailAsync(randomGuid);
+
+            // Kontroll
+            Assert.Null(result);
+        }
     }
 }

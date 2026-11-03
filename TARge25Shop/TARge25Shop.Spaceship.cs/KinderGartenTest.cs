@@ -558,5 +558,23 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotNull(imageModel.ImageData);
             Assert.True(imageModel.ImageData.Length > 0);
         }
+
+        [Fact]
+        // See test kontrollib, et konkreetne pilt on seotud õige lasteaia Id-ga.
+        // Vastasel juhul test ebaõnnestub.
+        public async Task Should_AddImageToKinderGartenId_Correctly()
+        {
+            // Ülesseade
+            Guid kindergartenId = Guid.Parse("f40900a6-7c03-47af-b10c-4a035f8664fa");
+            KinderGartenImageViewModel imageModel = new KinderGartenImageViewModel()
+            {
+                KinderGartenId = kindergartenId,
+                ImageTitle = "lasteaed.png"
+            };
+
+            // Kontroll
+            Assert.NotNull(imageModel.KinderGartenId);
+            Assert.Equal(kindergartenId, imageModel.KinderGartenId);
+        }
     }
 }

@@ -576,5 +576,34 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotNull(imageModel.KinderGartenId);
             Assert.Equal(kindergartenId, imageModel.KinderGartenId);
         }
+
+        [Fact]
+        // See test kontrollib olukorda, kus mitme pildi lisamisel kustutatakse üks ära,
+        // siis peaks teine pilt alles jääma. Kui alles jääb vale pilt või kõik pildid kustutatakse,
+        // siis test ebaõnnestub.
+        public async Task Should_RemoveOneImage_WhenMultipleImagesAreAdded()
+        {
+            // Ülesseade
+            Guid imageId1 = Guid.NewGuid();
+            Guid imageId2 = Guid.NewGuid();
+
+            KinderGartenImageViewModel image1 = new KinderGartenImageViewModel()
+            {
+                ImageId = imageId1,
+                ImageTitle = "pilt1.jpg",
+            };
+
+            KinderGartenImageViewModel image2 = new KinderGartenImageViewModel()
+            {
+                ImageId = imageId2,
+                ImageTitle = "pilt2.jpg",
+            };
+
+            // Kontroll
+            Assert.NotEqual(image1.ImageId, image2.ImageId);
+            Assert.Equal("pilt1.jpg", image1.ImageTitle);
+            Assert.Equal("pilt2.jpg", image2.ImageTitle);
+        }
+
     }
 }

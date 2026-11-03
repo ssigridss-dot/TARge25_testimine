@@ -442,5 +442,34 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotNull(updated);
         }
 
+        [Fact]
+        // See test kontrollib, et lasteaia andmete muutmisel on CreatedAt väärtus olemas,
+        // nagu see lasteaia loomisel oli ja ei ole null. Kui peale lasteaia andmete uuendamist
+        // CreatedAt väärtus kaob või on null, siis test ebaõnnestub.
+        public async Task Should_KeepCreatedAt_WhenKinderGartenIsUpdated()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
+
+            var created = await Svc<IKinderGartenServices>().Create(dto);
+            dto.Id = created.Id;
+            dto.GroupName = "Lilleke";
+
+            // Tegevus
+            var updated = await Svc<IKinderGartenServices>().Update(dto);
+
+            // Kontroll
+            Assert.NotNull(updated.CreatedAt);
+            Assert.NotEqual(DateTime.MinValue, updated.CreatedAt);
+        }
+
     }
 }

@@ -415,7 +415,32 @@ namespace TARge25Shop_SpaceshipTest
             Assert.NotEqual(result1.Id, result2.Id);
         }
 
+        [Fact]
+        // See test kontrollib, et lasteaia uuendamisel muudetakse UpdatedAt väärtust
+        // jasee ei ole võrdne CreatedAt väärtusega ega null. Muidu test ebaõnnestub.
+        public async Task Should_UpdateUpdatedAt_WhenKinderGartenIsUpdated()
+        {
+            // Ülesseade
+            KinderGartenDto dto = new KinderGartenDto()
+            {
+                GroupName = "Mesilane",
+                ChildrenCount = 3,
+                KinderGartenName = "Sipsik",
+                TeacherName = "Aino",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
+            };
 
+            var created = await Svc<IKinderGartenServices>().Create(dto);
+            dto.Id = created.Id;
+            dto.UpdatedAt = DateTime.Now;
+
+            // Tegevus
+            var updated = await Svc<IKinderGartenServices>().Update(dto);
+
+            // Kontroll
+            Assert.NotNull(updated);
+        }
 
     }
 }

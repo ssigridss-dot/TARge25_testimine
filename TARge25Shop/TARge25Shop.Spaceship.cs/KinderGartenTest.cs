@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TARge25Shop.Core.Dto;
 using TARge25Shop.Core.ServiceInterface;
+using TARge25Shop.Models.KinderGarten;
 using Xunit;
 
 namespace TARge25Shop_SpaceshipTest
@@ -511,6 +512,33 @@ namespace TARge25Shop_SpaceshipTest
 
             // Kontroll
             Assert.Null(result);
+        }
+
+        [Fact]
+        // See test kontrollib, et lasteaia piltide lisamisel 
+        // salvestatakse pildi pealkiri ja Id õigesti, muidu test ebaõnnestub.
+        public async Task Should_VerifyKinderGartenImageViewModelWork()
+        {
+            // Ülesseade
+            Guid imageId = Guid.NewGuid();
+            Guid kindergartenId = Guid.NewGuid();
+
+            // Tegevus
+            var mockBytes = Encoding.UTF8.GetBytes("suvapilt");
+
+            KinderGartenImageViewModel imageModel = new KinderGartenImageViewModel()
+            {
+                ImageId = imageId,
+                ImageTitle = "rebane.jpg",
+                ImageData = mockBytes,
+                KinderGartenId = kindergartenId
+            };
+
+            // Kontroll
+            Assert.Equal(imageId, imageModel.ImageId);
+            Assert.Equal("rebane.jpg", imageModel.ImageTitle);
+            Assert.NotNull(imageModel.ImageData);
+            Assert.Equal(kindergartenId, imageModel.KinderGartenId);
         }
     }
 }

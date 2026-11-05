@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Firefox;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit;
@@ -53,7 +54,7 @@ namespace TARge25Shop.SeleniumTesting
     }
     //enne testi klassi kirjeldatakse ära mille järgi testid sorteeritakse
     //tunnuse "TestCaseOrderer"i järgi. Sulgude vahel esimene väärtus on klassi asukoht ise, teine väärtus on nimeruum kus klass asub.
-    [TestCaseOrderer("TARge25Shop.SeleniumTesting.PriorityOrderer", "TARge25Shop.SeleniumTesting")]
+    [TestCaseOrderer("TARge25Shop.SeleniumTesting.PriorityOrderer", "SeleniumTesting")]
     public class SpaceshipFrontendTests
     {
         public static string thisRunGuid { get; set; }

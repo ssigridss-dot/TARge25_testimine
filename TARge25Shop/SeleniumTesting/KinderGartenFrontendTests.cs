@@ -10,7 +10,6 @@ using Xunit.Sdk;
 
 namespace TARge25Shop.SeleniumTesting
 {
-    [TestCaseOrderer("TARge25Shop.SeleniumTesting.KinderGartenPriorityOrderer", "TARge25Shop.SeleniumTesting")]
     public class KinderGartenPriorityOrderer : ITestCaseOrderer
     {
         public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases)
@@ -30,6 +29,7 @@ namespace TARge25Shop.SeleniumTesting
             }).ToList();
         }
     }
+    [TestCaseOrderer("TARge25Shop.SeleniumTesting.KinderGartenPriorityOrderer", "SeleniumTesting")]
     public class KinderGartenFrontendTests
     {
         public static string thisRunGuid { get; set; }
@@ -140,7 +140,7 @@ namespace TARge25Shop.SeleniumTesting
         [Fact]
         [Order(3)]
         // See test kontrollib, et Update töötab. Tabelis oleva lasteaia andmed
-        // muudetakse ja kuvatakse õigesti index lehel.
+        // muudetakse ja kuvatakse õigesti detailide lehel(controller suunab sinna).
         public void Should_UpdateKinderGarten_WithNewData()
         {
             // ülesseade
@@ -191,6 +191,58 @@ namespace TARge25Shop.SeleniumTesting
             Assert.Equal("25", details_childrenCount);
             Assert.Equal("Mesilane", details_kinderGartenName);
             Assert.Equal("Kati", details_teacherName);
+        }
+
+        [Fact]
+        [Order(4)]
+        // See test kontrollib, et lasteaed kustutatakse andmebaasist.
+        public void Should_DeleteKinderGarten()
+        {
+            // ülesseade
+            IWebDriver driver = SetupAndNavigateKinderGartenIndex();
+
+            // otsime üles kõik tabeli read
+            var table = driver.FindElement(By.Id("IndexTable"));
+            List<IWebElement> rows = table.FindElements(By.TagName("tr")).ToList();
+            rows.RemoveAt(0);
+
+            // käime kõik read läbi
+            foreach (var row in rows)
+            {
+                var locatedelement = row.FindElement(By.Id("IndexNameKinderGarten"));
+                if (locatedelement.Text == "Mesilane")
+                {
+                    // leiab ja vajutab Delete nuppu
+                    var button = row.FindElement(By.Id("IndexKinderGartenDelete"));
+                    button.Click();
+                    Thread.Sleep(1000);
+                    break;
+                }
+            }
+
+            IWebElement deleteButton = driver.FindElement(By.Id("DeleteButton"));
+            deleteButton.Click();
+            Thread.Sleep(1000);
+
+            var updatedTable = driver.FindElement(By.Id("IndexTable"));
+            List<IWebElement> updatedRows = updatedTable.FindElements(By.TagName("tr")).ToList();
+            updatedRows.RemoveAt(0);
+
+            bool doesItExist = false;
+
+            foreach (var row in updatedRows)
+            {
+                if (row.FindElement(By.Id("IndexNameKinderGarten")).Text == "Mesilane")
+                {
+                    doesItExist = true;
+                    break;
+                }
+            }
+
+            driver.Quit();
+
+            // kontroll
+            Assert.False(doesItExist);
         }
 
         private IWebDriver SetupAndNavigateKinderGartenIndex()

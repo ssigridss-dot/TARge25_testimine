@@ -272,6 +272,38 @@ namespace TARge25Shop.SeleniumTesting
             Assert.Contains("Internal Server Error", pageSource);
         }
 
+        [Fact]
+        [Order(6)]
+        // See test kontrollib, et lasteaeda ei looda, kui laste arvu üritatakse numbri asemel
+        // tekstina kirjutada, sest andmebaasis on kohustuslikuks andmetüübiks int. Rakendus jääb
+        // Create lehele seisma.
+        public void Should_Not_CreateKinderGarten_WithLettersInChildrenCount()
+        {
+            // Ülesseade
+            IWebDriver driver = SetupAndNavigateKinderGartenIndex();
+
+            // Tegevus
+            driver.FindElement(By.Id("CreateInIndex")).Click();
+
+            string name = Guid.NewGuid().ToString();
+
+            driver.FindElement(By.Id("CU_GroupNameKinderGarten")).SendKeys("Sipsikud");
+
+            IWebElement childrenCount = driver.FindElement(By.Id("CU_ChildrenCountKinderGarten"));
+            childrenCount.SendKeys("abc");
+
+            driver.FindElement(By.Id("CU_KinderGartenNameKinderGarten")).SendKeys(name);
+            driver.FindElement(By.Id("CU_TeacherNameKinderGarten")).SendKeys("Aino");
+
+            driver.FindElement(By.Id("CU_CreateKinderGarten")).Click();
+            Thread.Sleep(1000);
+
+            // Kontroll
+            Assert.Contains("/kinderGarten/create", driver.Url);
+
+            driver.Quit();
+        }
+
         private IWebDriver SetupAndNavigateKinderGartenIndex()
         {
             IWebDriver driver = new FirefoxDriver();

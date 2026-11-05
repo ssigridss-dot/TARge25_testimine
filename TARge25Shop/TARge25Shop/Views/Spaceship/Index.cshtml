@@ -8,12 +8,12 @@
     short rowNumber = 1;
 }
 
-
 <div class="h1">
     Spaceships
 </div>
+
 <form method="get">
-    <table class="table table-hover">
+    <table id="IndexTable" class="table table-hover">
         <thead>
             <tr>
                 <th id="IndexRowNumberColumn" scope="col">Nr</th>
@@ -30,15 +30,14 @@
                 <tr>
                     <td id="IndexRowNumberSpaceship">@rowNumber</td>
                     <td id="IndexNameSpaceship">@spaceship.Name</td>
-                    <td id="IndexTypaSpaceship">@spaceship.ShipType</td>
-                    <td id="IndexBuiltDataSpaceship">@spaceship.CreatedAt</td>
+                    <td id="IndexTypeSpaceship">@spaceship.ShipType</td>
+                    <td id="IndexBuiltDateSpaceship">@spaceship.CreatedAt</td>
                     <td id="IndexCrewSpaceship">@spaceship.Crew</td>
-                    <td id="IndexActionsSpaceship"></td>
-                    <td>
+                    <td id="IndexActionsSpaceship">
                         <span id="IndexSpaceshipId" hidden>@spaceship.Id</span>
-                        <a asp-action="details" asp-controller="spaceship" asp-route-id="@spaceship.Id" class="btn btn-primary">Details</a>
-                        <a asp-action="update" asp-controller="spaceship" asp-route-id="@spaceship.Id" class="btn btn-primary">Update</a>
-                        <a asp-action="delete" asp-controller="spaceship" asp-route-id="@spaceship.Id" class="btn btn-outline-danger">Delete</a>
+                        <a id="IndexSpaceshipDetails" asp-action="details" asp-controller="spaceship" asp-route-id="@spaceship.Id" class="btn btn-primary">Details</a>
+                        <a id="IndexSpaceshipUpdate" asp-action="update" asp-controller="spaceship" asp-route-id="@spaceship.Id" class="btn btn-primary">Update</a>
+                        <a id="IndexSpaceshipDelete" asp-action="delete" asp-controller="spaceship" asp-route-id="@spaceship.Id" class="btn btn-outline-danger">Delete</a>
                     </td>
                 </tr>
                 rowNumber += 1;
@@ -46,4 +45,3 @@
         </tbody>
     </table>
 </form>
-

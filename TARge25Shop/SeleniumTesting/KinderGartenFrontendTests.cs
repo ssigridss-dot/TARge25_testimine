@@ -1,25 +1,17 @@
-﻿/*using OpenQA.Selenium;
-using OpenQA.Selenium.Firefox;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
+using System.Linq;
+using System.Threading;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Firefox;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace SeleniumTesting
+namespace TARge25Shop.SeleniumTesting
 {
-    public class OrderAttribute : Attribute
-    {
-        public int Value { get; }
-        public OrderAttribute(int value)
-        {
-            Value = value;
-        }
-    }
-
-    public class PriorityOrderer : ITestCaseOrderer
+    [TestCaseOrderer("TARge25Shop.SeleniumTesting.KinderGartenPriorityOrderer", "TARge25Shop.SeleniumTesting")]
+    public class KinderGartenPriorityOrderer : ITestCaseOrderer
     {
         public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases)
             where TTestCase : ITestCase
@@ -38,249 +30,192 @@ namespace SeleniumTesting
             }).ToList();
         }
     }
-
-    [TestCaseOrderer("TARge25Shop.SeleniumTesting.PriorityOrderer", "TARge25Shop.SeleniumTesting")]
     public class KinderGartenFrontendTests
     {
         public static string thisRunGuid { get; set; }
         [Fact]
         [Order(1)]
+        // See test kontrollib Create funktsiooniga lasteaia loomist ja et see kuvatakse
+        // pärast õigete andmetega index lehel.
         public void Should_NavigateToCreate_AddKinderGarten_WithCorrectData_ReturnToIndex()
         {
-            //ülesseade
-            IWebDriver driver = SetupAndNavigateSIndex();
+            // ülesseade
+            IWebDriver driver = SetupAndNavigateKinderGartenIndex();
 
-            //tegevus
+            // tegevus
             IWebElement createInIndex = driver.FindElement(By.Id("CreateInIndex"));
             createInIndex.Click();
 
-            //sisestatavad andmed
-            InsertKinderGartenData(driver, null, false);
-
+            thisRunGuid = Guid.NewGuid().ToString();
+            InsertKinderGartenData(driver, thisRunGuid, false);
             IWebElement cu_CreateKinderGarten = driver.FindElement(By.Id("CU_CreateKinderGarten"));
             cu_CreateKinderGarten.Click();
+            Thread.Sleep(1000);
 
-            ////arvuti tudub
-            //Thread.Sleep(1000);
+            var table = driver.FindElement(By.Id("IndexTable"));
+            List<IWebElement> rows = table.FindElements(By.TagName("tr")).ToList();
+            rows.RemoveAt(0);
 
-            //andmete kogumine pärast reloadi
-            IWebElement indexGroupNameKinderGarten = driver.FindElement(By.Id("IndexGroupNameKinderGarten"));
-            var kinderGartenGroupNameData = indexGroupNameKinderGarten.Text;
-            IWebElement indexChildrenCountKinderGarten = driver.FindElement(By.Id("IndexChildrenCountKinderGarten"));
-            var kinderGartenChildrenCountData = indexChildrenCountKinderGarten.Text;
-            IWebElement indexKinderGartenNameKinderGarten = driver.FindElement(By.Id("IndexKinderGartenNameKinderGarten"));
-            var kinderGartenKinderGartenNameData = indexKinderGartenNameKinderGarten.Text;
+            bool doesItExist = false;
+            string groupNameData = "";
+            string childrenCountData = "";
+            string kinderGartenNameData = "";
+            string teacherNameData = "";
 
-            //kontroll
-            Assert.Equal(kinderGartenGroupNameData, "i add name for kindergarten group");
-            Assert.True(kinderGartenChildrenCountData == "12");
-            Assert.Equal(kinderGartenKinderGartenNameData, "i add kindergarten name");
-        }
-
-        private IWebDriver SetupAndNavigateSIndex()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void InsertKinderGartenData(IWebDriver driver, object value, bool v)
-        {
-            throw new NotImplementedException();
+            foreach (var row in rows)
+            {
+                if (row.FindElement(By.Id("IndexNameKinderGarten")).Text == thisRunGuid)
+                {
+                    doesItExist = true;
+                    groupNameData = row.FindElement(By.Id("IndexGroupNameKinderGarten")).Text;
+                    childrenCountData = row.FindElement(By.Id("IndexChildrenCountKinderGarten")).Text;
+                    kinderGartenNameData = row.FindElement(By.Id("IndexNameKinderGarten")).Text;
+                    teacherNameData = row.FindElement(By.Id("IndexTeacherNameKinderGarten")).Text;
+                    break;
+                }
+            }
+            driver.Quit();
+            // kontroll
+            Assert.True(doesItExist);
+            Assert.Equal("Sipsikud", groupNameData);
+            Assert.Equal("20", childrenCountData);
+            Assert.Equal(thisRunGuid, kinderGartenNameData);
+            Assert.Equal("Aino", teacherNameData);
         }
 
         [Fact]
         [Order(2)]
-        public void Should_NavigateToDetails_OfAKinderGarten_WithPreviouslyCorrectData()
+        // See test kontrollib, et lasteaedade details nupp töötab ja eelmises testis loodud
+        // lasteaia andmed kuvatakse detailide lehel õigesti.
+        public void Should_NavigateToDetails_OfAKinderGarten_WithCorrectData()
         {
-            //ülesseade
-            IWebDriver driver = SetupAndNavigateSIndex();
+            // ülesseade
+            IWebDriver driver = SetupAndNavigateKinderGartenIndex();
 
-            //otsime üles kõik tabeli read, rida htmli tabelis tähistatakse "tr"iga
-            //ICollection<IWebElement> table = driver.FindElements(By.TagName("tr"));
+            // otsime üles kõik tabeli read
             var table = driver.FindElement(By.Id("IndexTable"));
             List<IWebElement> rows = table.FindElements(By.TagName("tr")).ToList();
             rows.RemoveAt(0);
-            //tsükkel käib kõik read läbi
 
+            // käime läbi kõik read ja otsime üles eelmise testiga loodud lasteaia
             foreach (var row in rows)
             {
-
-                var locatedelement = row.FindElement(By.Id("IndexGroupNameKinderGarten"));
-                if (locatedelement.Text == "i add name for kindergarten")
+                var locatedelement = row.FindElement(By.Id("IndexNameKinderGarten"));
+                if (locatedelement.Text == thisRunGuid)
                 {
-                    //siis vajuta selles reas asuvat details nuppu
-                    var rowelement = row.FindElement(By.Id("IndexActionsKinderGarten"));
-                    var button = rowelement.FindElement(By.Id("IndexKinderGartenDetails"));
+                    // leiab ja vajutab Detaili nuppu
+                    var button = row.FindElement(By.Id("IndexKinderGartenDetails"));
                     button.Click();
-                    //pärast õiget vajutust, tsükkel katkestatakse
-                    //arvuti tudub
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     break;
                 }
             }
-            //andmete kogumine pärast reloadi
+
+            // andmete kogumine pärast reloadi
             IWebElement details_KinderGartenId = driver.FindElement(By.Id("Details_KinderGartenId"));
             var details_id = details_KinderGartenId.Text;
 
-            IWebElement details_KinderGartenGroupName = driver.FindElement(By.Id("Details_KinderGartenGroupName"));
+            IWebElement details_KinderGartenGroupName = driver.FindElement(By.Id("Details_GroupNameKinderGarten"));
             var details_groupName = details_KinderGartenGroupName.Text;
 
-            IWebElement details_KinderGartenChildrenCount = driver.FindElement(By.Id("Details_KinderGartenChildrenCount"));
+            IWebElement details_KinderGartenChildrenCount = driver.FindElement(By.Id("Details_ChildrenCountKinderGarten"));
             var details_childrenCount = details_KinderGartenChildrenCount.Text;
 
             IWebElement details_KinderGartenName = driver.FindElement(By.Id("Details_KinderGartenName"));
             var details_kinderGartenName = details_KinderGartenName.Text;
 
-            IWebElement details_KinderGartenTeacherName = driver.FindElement(By.Id("Details_KinderGartenTeacherName"));
+            IWebElement details_KinderGartenTeacherName = driver.FindElement(By.Id("Details_TeacherNameKinderGarten"));
             var details_teacherName = details_KinderGartenTeacherName.Text;
-            //kontroll
+
+            driver.Quit();
+
+            // kontroll
             Assert.NotNull(details_id);
-            //Assert.True(details_id.Contains("-") && (details_id.Count('-') == 4));
-            //Assert.True(details_id.Substring(0, 9).EndsWith("-"));
-            Assert.Equal("i add group name for kindergarten", details_groupName);
-            Assert.Equal("12", details_childrenCount);
-            Assert.Equal("i add name for kindergarten", details_kinderGartenName);
-            Assert.Equal("i add name for teacher", details_teacherName);
+            Assert.Equal("Sipsikud", details_groupName);
+            Assert.Equal("20", details_childrenCount);
+            Assert.Equal(thisRunGuid, details_kinderGartenName);
+            Assert.Equal("Aino", details_teacherName);
         }
 
         [Fact]
         [Order(3)]
-        public void Should_UpdateDetails_OfAKinderGarten_WithNewData()
+        // See test kontrollib, et Update töötab. Tabelis oleva lasteaia andmed
+        // muudetakse ja kuvatakse õigesti index lehel.
+        public void Should_UpdateKinderGarten_WithNewData()
         {
-            //ülesseade
-            IWebDriver driver = SetupAndNavigateSIndex();
+            // ülesseade
+            IWebDriver driver = SetupAndNavigateKinderGartenIndex();
 
-            //otsime üles kõik tabeli read, rida htmli tabelis tähistatakse "tr"iga
-            //ICollection<IWebElement> table = driver.FindElements(By.TagName("tr"));
+            // otsime üles kõik tabeli read
             var table = driver.FindElement(By.Id("IndexTable"));
             List<IWebElement> rows = table.FindElements(By.TagName("tr")).ToList();
             rows.RemoveAt(0);
-            //tsükkel käib kõik read läbi
 
+            // käime läbi kõik read
             foreach (var row in rows)
             {
-
-                var locatedelement = row.FindElement(By.Id("IndexGroupNameKinderGarten"));
-                if (locatedelement.Text == "i add group name for kindergarten")
+                var locatedelement = row.FindElement(By.Id("IndexNameKinderGarten"));
+                if (locatedelement.Text == thisRunGuid)
                 {
-                    //siis vajuta selles reas asuvat details nuppu
-                    var rowelement = row.FindElement(By.Id("IndexActionsKinderGarten"));
-                    var button = rowelement.FindElement(By.Id("IndexKinderGartenUpdate"));
+                    // leiab ja vajutab Update nuppu
+                    var button = row.FindElement(By.Id("IndexKinderGartenUpdate"));
                     button.Click();
-                    //pärast õiget vajutust, tsükkel katkestatakse
-                    //arvuti tudub
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     break;
                 }
             }
-            //sisestatavad andmed
-            InsertKinderGartenData(driver, null, true);
 
-            IWebElement cu_CreateKinderGarten = driver.FindElement(By.Id("CU_UpdateKinderGarten"));
-            cu_CreateKinderGarten.Click();
+            // uued andmed
+            InsertKinderGartenData(driver, "Mesilane", true);
+            IWebElement cu_UpdateKinderGarten = driver.FindElement(By.Id("CU_UpdateKinderGarten"));
+            cu_UpdateKinderGarten.Click();
+            Thread.Sleep(1000);
 
-            ////arvuti tudub
-            //Thread.Sleep(1000);
-        }
+            // andmete kogumine pärast reloadi
+            IWebElement details_KinderGartenGroupName = driver.FindElement(By.Id("Details_GroupNameKinderGarten"));
+            var details_groupName = details_KinderGartenGroupName.Text;
 
-        [Fact]
-        [Order(4)]
-        public void Should_DeleteKinderGarten_FromAppVIADeleteView()
-        {
-            //ülesseade
-            IWebDriver driver = SetupAndNavigateSIndex();
+            IWebElement details_KinderGartenChildrenCount = driver.FindElement(By.Id("Details_ChildrenCountKinderGarten"));
+            var details_childrenCount = details_KinderGartenChildrenCount.Text;
 
-            //otsime üles kõik tabeli read, rida htmli tabelis tähistatakse "tr"iga
-            //ICollection<IWebElement> table = driver.FindElements(By.TagName("tr"));
-            var table = driver.FindElement(By.Id("IndexTable"));
-            List<IWebElement> rows = table.FindElements(By.TagName("tr")).ToList();
-            rows.RemoveAt(0);
-            //tsükkel käib kõik read läbi
+            IWebElement details_KinderGartenName = driver.FindElement(By.Id("Details_KinderGartenName"));
+            var details_kinderGartenName = details_KinderGartenName.Text;
 
-            foreach (var row in rows)
-            {
-
-                var locatedelement = row.FindElement(By.Id("IndexGroupNameKinderGarten"));
-                if (locatedelement.Text == "DISISENJUNAEM")
-                {
-                    //siis vajuta selles reas asuvat details nuppu
-                    var rowelement = row.FindElement(By.Id("IndexActionsKinderGarten"));
-                    var button = rowelement.FindElement(By.Id("IndexKinderGartenDelete"));
-                    button.Click();
-                    //pärast õiget vajutust, tsükkel katkestatakse
-                    //arvuti tudub
-                    Thread.Sleep(500);
-                    break;
-                }
-            }
-            var clickthisbutton = driver.FindElement(By.Id("Delete_Delete"));
-            clickthisbutton.Click();
-
-            int rowCount = table.FindElements(By.TagName("tr")).ToList().Count();
-            Assert.True(rowCount < 2);
-        }
-
-        [Fact]
-        [Order(5)]
-        public void Should_NavigateToCreate_AddKinderGarten_WithCorrectData_ReturnToIndex_Proper()
-        {
-            //ülesseade
-            IWebDriver driver = SetupAndNavigateSIndex();
-
-            //tegevus
-            IWebElement createInIndex = driver.FindElement(By.Id("CreateInIndex"));
-            createInIndex.Click();
-
-            //sisestatavad andmed, siin tagastub ka kasutatud nimi
-            string concreteGroupName = InsertKinderGartenData_ReturnGroupName(driver, false);
-
-            IWebElement cu_CreateKinderGarten = driver.FindElement(By.Id("CU_CreateKinderGarten"));
-            cu_CreateKinderGarten.Click();
-
-            ////arvuti tudub
-            //Thread.Sleep(1000);
-
-            //andmete kogumine pärast reloadi
-            var tableOfIndex = driver.FindElement(By.Id("IndexTable"));
-            List<IWebElement> rowsOfTable = tableOfIndex.FindElements(By.TagName("tr")).ToList();
-            rowsOfTable.RemoveAt(0);
-            bool isObjectFound = false;
-            string kinderGartenGroupNameData = "";
-            string kinderGartenChildrenCountData = "";
-            string kinderGartenNameData = "";
-            string kinderGartenTeacherNameData = "";
-            //IWebElement indexNameSpaceship = driver.FindElement(By.Id("IndexNameSpaceship"));
-            //var spaceShipNameData = indexNameSpaceship.Text;
-            //IWebElement indexTypeSpaceship = driver.FindElement(By.Id("IndexTypeSpaceship"));
-            //var spaceShipTypeData = indexTypeSpaceship.Text;
-            //IWebElement indexCrewSpaceship = driver.FindElement(By.Id("IndexCrewSpaceship"));
-            //var spaceShipCrewData = indexCrewSpaceship.Text;
-            bool doesItExist = false;
-            foreach (var row in rowsOfTable)
-            {
-                if (row.FindElement(By.Id("IndexGroupNameSpaceship")).Text == thisRunGuid)
-                {
-                    doesItExist = true;
-                    kinderGartenGroupNameData = thisRunGuid;
-                    kinderGartenChildrenCountData = row.FindElement(By.Id("IndexChildrenCountKinderGarten")).Text;
-                    kinderGartenKinderGartenNameData = row.FindElement(By.Id("IndexKinderGartenNameKinderGarten")).Text;
-                    kinderGartenTeacherNameData = row.FindElement(By.Id("IndexTeacherNameKinderGarten")).Text;
-                    break;
-
-                }
-            }
-
-
-            //kui on doesitexist on true
+            IWebElement details_KinderGartenTeacherName = driver.FindElement(By.Id("Details_TeacherNameKinderGarten"));
+            var details_teacherName = details_KinderGartenTeacherName.Text;
 
             driver.Quit();
-            //kontroll
-            //Assert.True(concreteName == indexNameSpaceship.Text);
-            Assert.True(true == doesItExist);
-            Assert.Equal(spaceShipNameData, thisRunGuid);
-            Assert.True(spaceShipTypeData == "i add ship type for spaceship");
-            Assert.Equal(spaceShipCrewData, "12345");
-            Assert.True((thisRunGuid == spaceShipNameData) && ("i add name for spaceship" == spaceShipTypeData) && ("12345" == spaceShipCrewData));
+
+            // kontroll
+            Assert.Equal("Mürakarud", details_groupName);
+            Assert.Equal("25", details_childrenCount);
+            Assert.Equal("Mesilane", details_kinderGartenName);
+            Assert.Equal("Kati", details_teacherName);
+        }
+
+        private IWebDriver SetupAndNavigateKinderGartenIndex()
+        {
+            IWebDriver driver = new FirefoxDriver();
+            driver.Url = "https://localhost:7227/";
+            IWebElement kinderGartenLink = driver.FindElement(By.LinkText("KinderGarten"));
+            kinderGartenLink.Click();
+
+            return driver;
+        }
+        private void InsertKinderGartenData(IWebDriver driver, string name, bool isUpdate)
+        {
+            IWebElement groupName = driver.FindElement(By.Id("CU_GroupNameKinderGarten"));
+            groupName.Clear();
+            groupName.SendKeys(isUpdate ? "Mürakarud" : "Sipsikud");
+            IWebElement childrenCount = driver.FindElement(By.Id("CU_ChildrenCountKinderGarten"));
+            childrenCount.Clear();
+            childrenCount.SendKeys(isUpdate ? "25" : "20");
+            IWebElement kinderGartenName = driver.FindElement(By.Id("CU_KinderGartenNameKinderGarten"));
+            kinderGartenName.Clear();
+            kinderGartenName.SendKeys(name);
+            IWebElement teacherName = driver.FindElement(By.Id("CU_TeacherNameKinderGarten"));
+            teacherName.Clear();
+            teacherName.SendKeys(isUpdate ? "Kati" : "Aino");
         }
     }
 }
-*/

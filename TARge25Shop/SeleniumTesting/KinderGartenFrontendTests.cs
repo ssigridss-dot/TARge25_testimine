@@ -245,6 +245,33 @@ namespace TARge25Shop.SeleniumTesting
             Assert.False(doesItExist);
         }
 
+        [Fact]
+        [Order(5)]
+        // See test kontrollib, et lasteaeda ei looda tühja rühma nimega, sest 
+        // see on andmebaasis kohustuslik väli(controller vigaseid andmeid ei takista).
+        public void Should_Not_CreateKinderGarten_WithEmptyGroupName()
+        {
+            IWebDriver driver = SetupAndNavigateKinderGartenIndex();
+
+            driver.FindElement(By.Id("CreateInIndex")).Click();
+
+            string name = Guid.NewGuid().ToString();
+
+            driver.FindElement(By.Id("CU_GroupNameKinderGarten")).SendKeys("");
+            driver.FindElement(By.Id("CU_ChildrenCountKinderGarten")).SendKeys("20");
+            driver.FindElement(By.Id("CU_KinderGartenNameKinderGarten")).SendKeys(name);
+            driver.FindElement(By.Id("CU_TeacherNameKinderGarten")).SendKeys("Aino");
+
+            driver.FindElement(By.Id("CU_CreateKinderGarten")).Click();
+            Thread.Sleep(1000);
+
+            string pageSource = driver.PageSource;
+
+            driver.Quit();
+
+            Assert.Contains("Internal Server Error", pageSource);
+        }
+
         private IWebDriver SetupAndNavigateKinderGartenIndex()
         {
             IWebDriver driver = new FirefoxDriver();

@@ -348,6 +348,70 @@ namespace TARge25Shop.SeleniumTesting
             Assert.True(exists);
         }
 
+        [Fact]
+        [Order(8)]
+        // See test kontrollib, et kui luua mitu sama nimega lasteaeda, siis need
+        // salvestatakse andmebaasi erinevate Id-dega.
+        public void Should_CreateKinderGartens_WithSameName_DifferentIds()
+        {
+            // Ülesseade
+            IWebDriver driver = SetupAndNavigateKinderGartenIndex();
+
+            // Tegevus
+            string Siilike = Guid.NewGuid().ToString();
+
+            driver.FindElement(By.Id("CreateInIndex")).Click();
+            driver.FindElement(By.Id("CU_GroupNameKinderGarten")).SendKeys("Sipsikud");
+            IWebElement childrenCount = driver.FindElement(By.Id("CU_ChildrenCountKinderGarten"));
+            childrenCount.Clear();
+            childrenCount.SendKeys("20");
+            driver.FindElement(By.Id("CU_KinderGartenNameKinderGarten")).SendKeys("Siilike");
+            driver.FindElement(By.Id("CU_TeacherNameKinderGarten")).SendKeys("Aino");
+            driver.FindElement(By.Id("CU_CreateKinderGarten")).Click();
+            Thread.Sleep(1000);
+
+            driver.FindElement(By.Id("CreateInIndex")).Click();
+            driver.FindElement(By.Id("CU_GroupNameKinderGarten")).SendKeys("Mesilane");
+            childrenCount = driver.FindElement(By.Id("CU_ChildrenCountKinderGarten"));
+            childrenCount.Clear();
+            childrenCount.SendKeys("15");
+            driver.FindElement(By.Id("CU_KinderGartenNameKinderGarten")).SendKeys("Siilike");
+            driver.FindElement(By.Id("CU_TeacherNameKinderGarten")).SendKeys("Kati");
+            driver.FindElement(By.Id("CU_CreateKinderGarten")).Click();
+            Thread.Sleep(1000);
+
+            List<string> ids = new List<string>();
+
+            var table = driver.FindElement(By.Id("IndexTable"));
+            var rows = table.FindElements(By.TagName("tr")).ToList();
+            rows.RemoveAt(0);
+
+            int rowCount = rows.Count;
+
+            for (int i = 0; i < rowCount; i++)
+            {
+                table = driver.FindElement(By.Id("IndexTable"));
+                rows = table.FindElements(By.TagName("tr")).ToList();
+                rows.RemoveAt(0);
+
+                if (rows[i].FindElement(By.Id("IndexNameKinderGarten")).Text == "Siilike")
+                {
+                    rows[i].FindElement(By.Id("IndexKinderGartenDetails")).Click();
+
+                    string id = driver.FindElement(By.Id("Details_KinderGartenId")).Text;
+                    ids.Add(id);
+
+                    driver.Navigate().Back();
+                    Thread.Sleep(1000);
+                }
+            }
+            driver.Quit();
+
+            // Kontroll
+            Assert.Equal(2, ids.Count);
+            Assert.NotEqual(ids[0], ids[1]);
+        }
+
         private IWebDriver SetupAndNavigateKinderGartenIndex()
         {
             IWebDriver driver = new FirefoxDriver();

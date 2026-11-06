@@ -304,6 +304,50 @@ namespace TARge25Shop.SeleniumTesting
             driver.Quit();
         }
 
+        [Fact]
+        [Order(7)]
+        // See test kontrollib, kas lasteaed luuaks, kui laste arv on negatiivne. Kuna 
+        // andmebaasis on kohustuslikuks andmetüübiks int ja modelis piirangut pole, siis peaks
+        // test õnnestuma.
+        public void Should_CreateKinderGarten_WithNegativeChildrenCount()
+        {
+            // Ülesseade
+            IWebDriver driver = SetupAndNavigateKinderGartenIndex();
+
+            // Tegevus
+            driver.FindElement(By.Id("CreateInIndex")).Click();
+
+            string name = Guid.NewGuid().ToString();
+
+            driver.FindElement(By.Id("CU_GroupNameKinderGarten")).SendKeys("Sipsikud");
+            IWebElement childrenCount = driver.FindElement(By.Id("CU_ChildrenCountKinderGarten"));
+            childrenCount.Clear();
+            childrenCount.SendKeys("-4");
+            driver.FindElement(By.Id("CU_KinderGartenNameKinderGarten")).SendKeys(name);
+            driver.FindElement(By.Id("CU_TeacherNameKinderGarten")).SendKeys("Aino");
+
+            driver.FindElement(By.Id("CU_CreateKinderGarten")).Click();
+            Thread.Sleep(1000);
+
+            var table = driver.FindElement(By.Id("IndexTable"));
+            var rows = table.FindElements(By.TagName("tr")).ToList();
+            rows.RemoveAt(0);
+            bool exists = false;
+            foreach (var row in rows)
+            {
+                if (row.FindElement(By.Id("IndexNameKinderGarten")).Text == name)
+                {
+                    exists = true;
+                    Assert.Equal("-4", row.FindElement(By.Id("IndexChildrenCountKinderGarten")).Text);
+                    break;
+                }
+            }
+            driver.Quit();
+
+            // Kontroll
+            Assert.True(exists);
+        }
+
         private IWebDriver SetupAndNavigateKinderGartenIndex()
         {
             IWebDriver driver = new FirefoxDriver();
